@@ -38,7 +38,7 @@
 											<i class="fas fa-hourglass-end" style="font-size:6rem; color:#0ea511; opacity:70%"></i>
 										</div>
 										<div>
-											<h1><?= $completed_hours ?></h1>
+											<h1><?= $completed_hours ?> H</h1>
 										</div>
 									</div>
 								</div>
@@ -53,7 +53,7 @@
 											<i class="fas fa-hourglass-end text-danger" style="font-size:6rem; transform:rotate(180deg); opacity:70%"></i>
 										</div>
 										<div>
-											<h1><?= $remaining_hours ?></h1>
+											<h1><?= $remaining_hours ?> H</h1>
 										</div>
 									</div>
 								</div>

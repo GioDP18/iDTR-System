@@ -13,7 +13,9 @@ $userDetails = $userDetails->fetch_assoc();
 
 
 // Constant Variables 
-$currentTime = date('h:i A');
+$timeAbbreviation = date('A');
+$currentTime = date('H:i:s');
+$formattedCurrentTime = date('h:i A');
 $currentDate = date('Y-m-d');
 $intern_id = $userDetails['id'];
 $firstname = $userDetails['firstname'];

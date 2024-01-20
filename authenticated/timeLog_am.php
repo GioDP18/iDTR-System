@@ -51,12 +51,12 @@
 							</div>
 							<div class="d-flex" style="gap:7px;">
 								<div>
-									<button class="log bg-success" onclick="time_in_am(<?= $intern_id ?>, '<?= $currentTime ?>', '<?= $currentDate ?>')">
+									<button class="log bg-success" onclick="handleTimeIn(<?= $intern_id ?>, '<?= $currentTime ?>', '<?= $currentDate ?>', '<?= $formattedCurrentTime ?>')">
 										<span><i class="fas fa-clock"></i> Time-In</span>
 									</button>
 								</div>
 								<div>
-									<button class="log bg-danger">
+									<button class="log bg-danger" onclick="handleTimeOut(<?= $intern_id ?>, '<?= $currentTime ?>', '<?= $currentDate ?>', '<?= $formattedCurrentTime ?>')">
 										<span><i class="fas fa-clock"></i> Time-Out</span>
 									</button>
 								</div>
@@ -67,30 +67,42 @@
 				<div class="page-inner mt--5">
 					<div class="card bg-light" style="border-radius:10px;">
 						<div class="card-body">
-							<table id="dailyTimeLog" class="display table table-striped table-hover" >
-								<thead>
-									<tr>
-										<th>Date</th>
-										<th>Arrival</th>
-										<th>Departure</th>
-										<th>Hours Late</th>
-										<th>Minutes Late</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>January 19, 2024</td>
-										<td>8:00 AM</td>
-										<td>5:00 PM</td>
-										<td></td>
-										<td>8 Hours</td>
-									</tr>
-								</tbody>
-							</table>
+							<div class="table-responsive">
+								<table id="dailyTimeLog" class="table table-striped table-hover" style="width:100%;">
+									<thead>
+										<tr>
+											<th>Date</th>
+											<th>Arrival</th>
+											<th>Departure</th>
+											<th>Hours Late</th>
+											<th>Minutes Late</th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php
+											$fetchMyTimeLogQuesry = "SELECT * FROM `daily_time_records` WHERE intern_id = '$intern_id' ORDER BY date DESC";
+											$result = $db->conn->query($fetchMyTimeLogQuesry);
+											if ($result->num_rows > 0):
+												// output data of each row
+												while($row = $result->fetch_assoc()):
+										?>
+										<tr>
+											<td><?= date_create($row['date'])->format('M d, Y') ?></td>
+											<td><?= date_create($row['arrival_am'])->format('h:i A'); ?></td>
+											<td><?= $row['departure_am'] ? date_create($row['departure_am'])->format('h:i A'):''; ?></td>
+											<td><?= $row['hours_late_am'] ?></td>
+											<td><?= $row['minutes_late_am'] ?></td>
+										</tr>
+										<?php endwhile; else: ?>
+										<tr>
+											<td class="text-center" colspan="5">No Time Log.</td>
+										</tr>
+										<?php endif;?>
+									</tbody>
+								</table>
+							</div>
 						</div>
-						
 					</div>
-					
 				</div>
 			</div>
 			<footer class="footer">
@@ -110,33 +122,107 @@
 			});
 	})
 
-	function time_in_am(intern_id, time, date){
+	function time_in_am(intern_id, time, date, formattedCurrentTime){
 		$.ajax({
-                url: '../backend/API.php?f=time_in_am',
-                method: 'POST',
-                data: {
-                    intern_id: intern_id,
-					time: time,
-					date: date
-                },
-                success: function(response) {
-					console.log(response);
-                    swal({
-                        title: "Time-in Recoded",
- 						text: "Time check: " + time,
-                        icon: "success",
-                        button: "Okay",
-                    });
+			url: '../backend/API.php?f=time_in_am',
+			method: 'POST',
+			data: {
+				intern_id: intern_id,
+				time: time,
+				date: date
+			},
+			dataType: 'json',
+			success: function(response) {
+				if(response.success == true){
+					swal({
+						title: "Time-in Recoded",
+						text: "Time check: " + formattedCurrentTime,
+						icon: "success",
+						button: "Okay",
+					});
 
-                    setTimeout(function() {
-                        location.reload();
-                    }, 5000);
-                },
-                error: function(xhr, status, error) {
-                    // Handle errors
-                    console.error('Error:', error);
-                }
-            });
+					setTimeout(function() {
+						location.reload();
+					}, 3000);
+				}
+				else{
+					console.log(response.message)
+					swal({
+						title: response.message,
+						icon: "error",
+						button: "Okay",
+					});
+
+					setTimeout(function() {
+						
+					}, 3000);
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+
+	function time_out_am(intern_id, time, date, formattedCurrentTime){
+		$.ajax({
+			url: '../backend/API.php?f=time_out_am',
+			method: 'POST',
+			data: {
+				intern_id: intern_id,
+				time: time,
+				date: date
+			},
+			success: function(response) {
+				console.log(response);
+				swal({
+					title: "Time-out Recoded",
+					text: "Time check: " + formattedCurrentTime,
+					icon: "success",
+					button: "Okay",
+				});
+
+				setTimeout(function() {
+					location.reload();
+				}, 5000);
+			},
+			error: function(xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+
+
+	function handleTimeIn(intern_id, time, date, formattedCurrentTime){
+		swal({
+			title: "Please Confirm Your Time in",
+			icon: "warning",
+			buttons: {
+				cancel: "Cancel",
+				confirm: "Confirm",
+			},
+		})
+		.then((willDelete) => {
+			if (willDelete) {
+				time_in_am(intern_id, time, date, formattedCurrentTime);
+			}
+		});
+	}
+
+	function handleTimeOut(intern_id, time, date, formattedCurrentTime){
+		swal({
+			title: "Please Confirm Your Time out",
+			icon: "warning",
+			buttons: {
+				cancel: "Cancel",
+				confirm: "Confirm",
+			},
+		})
+		.then((willDelete) => {
+			if (willDelete) {
+				time_out_am(intern_id, time, date, formattedCurrentTime);
+			}
+		});
 	}
 </script>
 
