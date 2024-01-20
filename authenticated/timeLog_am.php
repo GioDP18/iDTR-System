@@ -173,18 +173,32 @@
 				time: time,
 				date: date
 			},
+			dataType: 'json',
 			success: function(response) {
-				console.log(response);
-				swal({
-					title: "Time-out Recoded",
-					text: "Time check: " + formattedCurrentTime,
-					icon: "success",
-					button: "Okay",
-				});
+				if(response.success == true){
+					swal({
+						title: "Time-out Recoded",
+						text: "Time check: " + formattedCurrentTime,
+						icon: "success",
+						button: "Okay",
+					});
 
-				setTimeout(function() {
-					location.reload();
-				}, 5000);
+					setTimeout(function() {
+						location.reload();
+					}, 3000);
+				}
+				else{
+					console.log(response.message)
+					swal({
+						title: response.message,
+						icon: "error",
+						button: "Okay",
+					});
+
+					setTimeout(function() {
+						
+					}, 3000);
+				}
 			},
 			error: function(xhr, status, error) {
 				console.error('Error:', error);
