@@ -145,7 +145,49 @@ class Master extends DBConnection{
 		exit;
 	}
 
-	
+	function time_out_pm(){
+		extract($_POST);
+		$timeAbbreviation = date('A');
+		if($timeAbbreviation === 'PM'){
+			$checkQuery = $this->conn->query("SELECT * FROM `daily_time_records` WHERE intern_id = '$intern_id' AND date = '$date'");
+			if($checkQuery->num_rows < 0){
+				$response['success'] = false;
+				$response['message'] = "Opss! You have not time-in on this day.";
+			}
+			elseif($checkQuery->num_rows === 1){
+				$checkResult = $checkQuery->fetch_assoc();
+				if(!$checkResult['departure_pm']){
+					$stmt = $this->conn->prepare("UPDATE `daily_time_records` SET departure_pm =? WHERE intern_id =? AND date =?");
+					$stmt->bind_param("sss", $time, $intern_id, $date);
+					$result = $stmt->execute();
+					if($result){
+						$response['success'] = true;
+					}
+					else{
+						$response['success'] = false;
+						$response['message'] = "There was an error logging your time-out. Please try again later.";
+					}
+					$stmt->close();
+				}
+				else{
+					$response['success'] = false;
+                    $response['message'] = "You have already time-out on this afternoon.";
+				}
+				
+			}
+			else{
+				$response['success'] = false;
+                $response['message'] = "Your log record for this day has exceeded its limit.";
+			}
+		}
+		else{
+			$response['success'] = false;
+			$response['message'] = "It's morning, you can log here later.";
+		}
+		header('Content-Type: application/json');
+		echo json_encode($response);
+		exit;
+	}
 	
 }
 
