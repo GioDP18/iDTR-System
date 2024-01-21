@@ -49,9 +49,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                                     <span class="sub-item">PM</span>
                                 </a>
                             </li>
-                            <li class=" <?= $currentPage=='timeLog_pm.php' ? 'active':'' ?>">
-                                <a href="timeLog_pm.php">
-                                    <span class="sub-item">Overtime</span>
+                            <li class=" <?= $currentPage=='summary.php' ? 'active':'' ?>">
+                                <a href="summary.php">
+                                    <span class="sub-item">Summary</span>
                                 </a>
                             </li>
                         </ul>
