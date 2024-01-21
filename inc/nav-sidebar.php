@@ -37,8 +37,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         <p>Time Log</p>
 						<span class="caret"></span>
                     </a>
-                    <div class="collapse" id="timeLog">
-                        <ul class="nav nav-collapse">
+                    <div class="collapses" id="timeLog">
+                        <ul class="nav nav-collapse" >
                             <li class=" <?= $currentPage=='timeLog_am.php' ? 'active':'' ?>">
                                 <a href="timeLog_am.php">
                                     <span class="sub-item">AM</span>

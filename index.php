@@ -7,7 +7,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DTR-System</title>
+    <title>iDTR System</title>
+	<link rel="icon" href="assets/img/logo.jpg" type="image/x-icon"/>
     <!-- Fontawesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Bootstrap CDN -->
@@ -132,17 +133,27 @@
 </style>
 
 <body>
-    <div style="display:flex;">
+    <div style="display:flex; position:relative;">
+        <div style="position:absolute; top:25%; left:10%; width:40%">
+            <div class="" style="width:100%; text-align:center;">
+                <img src="assets/img/logo-transparent.png" alt="" style="width:12rem; height:10rem;">
+            </div>
+            <div class="text-center mt-4">
+                <h5 class="text-light">Unlocking productivity, one clock-in at a time. iDTR: 
+                    Where dedication meets efficiency, shaping a seamless journey through time records 
+                    and unlocking the door to professional growth.</h5>
+            </div>
+        </div>
         <div class="login-container">
-            <div class="login-form" style="position:relative;">
-                <?php if(isset($_GET['error-login'])): ?>
-                    <div class="" style="position:absolute; top:8rem; ">
-                        <div class="" style="background-color:#F1AEB5;">
-                            <p style="text-align:center; font-size:small; width:18rem; padding:.5rem 0;">Invalid Credentials, please try again.</p>
+            <div class="login-form">
+                <form class="form" action="backend/authenticate.php" method="POST" style="position:relative;">
+                    <?php if(isset($_GET['error-login'])): ?>
+                        <div class="" style="position:absolute; top:-2.5rem; ">
+                            <div class="" style="background-color:#F1AEB5;">
+                                <p style="text-align:center; font-size:small; width:18rem; padding:.5rem 0;"><?= $_GET['error-login'] ?></p>
+                            </div>
                         </div>
-                    </div>
-                <?php endif; ?>
-                <form class="form" action="backend/authenticate.php" method="POST">
+                    <?php endif; ?>
                     <p class="form-title">Sign in to your account</p>
                     <div class="input-container">
                         <input type="text" name="username" placeholder="Enter Username">

@@ -30,7 +30,7 @@ if (isset($_POST['login'])) {
                 echo "<script>location.href='../index.php?error-login=Invalid Credentials, Please try again.'</script>";
             }
         } else {
-            echo "User not found";
+            echo "<script>location.href='../index.php?error-login=This user does not exists.'</script>";
         }
 
         $stmt->close();
