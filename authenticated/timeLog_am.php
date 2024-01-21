@@ -74,8 +74,8 @@
 											<th>Date</th>
 											<th>Arrival</th>
 											<th>Departure</th>
-											<th>Hours Late</th>
-											<th>Minutes Late</th>
+											<th>Late</th>
+											<th>Number of Hours Worked</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -90,12 +90,12 @@
 											<td><?= date_create($row['date'])->format('M d, Y') ?></td>
 											<td><?= date_create($row['arrival_am'])->format('h:i A'); ?></td>
 											<td><?= $row['departure_am'] ? date_create($row['departure_am'])->format('h:i A'):''; ?></td>
-											<td><?= $row['hours_late_am'] ?></td>
-											<td><?= $row['minutes_late_am'] ?></td>
+											<td><?= $row['late_am'] ?></td>
+											<td><?= $row['worked_hours_am']; ?></td>
 										</tr>
 										<?php endwhile; else: ?>
 										<tr>
-											<td class="text-center" colspan="5">No Time Log.</td>
+											<td class="text-center" colspan="6">No Time Log.</td>
 										</tr>
 										<?php endif;?>
 									</tbody>
@@ -136,7 +136,6 @@
 				if(response.success == true){
 					swal({
 						title: "Time-in Recoded",
-						text: "Time check: " + formattedCurrentTime,
 						icon: "success",
 						button: "Okay",
 					});
@@ -178,7 +177,6 @@
 				if(response.success == true){
 					swal({
 						title: "Time-out Recoded",
-						text: "Time check: " + formattedCurrentTime,
 						icon: "success",
 						button: "Okay",
 					});
@@ -210,6 +208,7 @@
 	function handleTimeIn(intern_id, time, date, formattedCurrentTime){
 		swal({
 			title: "Please Confirm Your Time in",
+			text: "Time check: " + formattedCurrentTime,
 			icon: "warning",
 			buttons: {
 				cancel: "Cancel",
@@ -226,6 +225,7 @@
 	function handleTimeOut(intern_id, time, date, formattedCurrentTime){
 		swal({
 			title: "Please Confirm Your Time out",
+			text: "Time check: " + formattedCurrentTime,
 			icon: "warning",
 			buttons: {
 				cancel: "Cancel",

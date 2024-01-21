@@ -16,9 +16,9 @@ class Master extends DBConnection{
 		if(!$this->conn->error)
 			return false;
 		else{
-			$resp['status'] = 'failed';
-			$resp['error'] = $this->conn->error;
-			return json_encode($resp);
+			$response['status'] = 'failed';
+			$response['error'] = $this->conn->error;
+			return json_encode($response);
 			exit;
 		}
 	}
@@ -39,6 +39,10 @@ class Master extends DBConnection{
 				$result = $stmt->execute();
 	
 				if($result){
+					if($time > '08:00:00'){
+						$this->conn->query("UPDATE daily_time_records SET late_am = TIMEDIFF(arrival_am, STR_TO_DATE('08:00:00', '%H:%i:%s')) WHERE intern_id = '$intern_id' AND date = '$date'");
+					}
+					$this->conn->query("UPDATE `interns` SET status = 1 WHERE id = '$intern_id'");
 					$response['success'] = true;
 				}
 				else{
@@ -62,7 +66,7 @@ class Master extends DBConnection{
 		$hour = date('H');
 		if($hour <= '12'){
 			$checkQuery = $this->conn->query("SELECT * FROM `daily_time_records` WHERE intern_id = '$intern_id' AND date = '$date'");
-			if($checkQuery->num_rows < 0){
+			if($checkQuery->num_rows <= 0){
 				$response['success'] = false;
 				$response['message'] = "Opss! You have not time-in on this morning.";
 			}
@@ -73,6 +77,8 @@ class Master extends DBConnection{
 					$stmt->bind_param("sss", $time, $intern_id, $date);
 					$result = $stmt->execute();
 					if($result){
+						$this->conn->query("UPDATE daily_time_records SET worked_hours_am = TIMEDIFF(departure_am, arrival_am) WHERE intern_id = '$intern_id' AND date = '$date'");
+						$this->conn->query("UPDATE `interns` SET status = 0 WHERE id = '$intern_id'");
 						$response['success'] = true;
 					}
 					else{
@@ -106,7 +112,7 @@ class Master extends DBConnection{
 		$timeAbbreviation = date('A');
 		if($timeAbbreviation === 'PM'){
 			$checkQuery = $this->conn->query("SELECT * FROM `daily_time_records` WHERE intern_id = '$intern_id' AND date = '$date'");
-			if($checkQuery->num_rows < 0){
+			if($checkQuery->num_rows <= 0){
 				$response['success'] = false;
 				$response['message'] = "Opss! You have not time-in on this morning.";
 			}
@@ -117,6 +123,10 @@ class Master extends DBConnection{
 					$stmt->bind_param("sss", $time, $intern_id, $date);
 					$result = $stmt->execute();
 					if($result){
+						if($time > '13:00:00'){
+							$this->conn->query("UPDATE daily_time_records SET late_pm = TIMEDIFF(arrival_pm, STR_TO_DATE('13:00:00', '%H:%i:%s')) WHERE intern_id = '$intern_id' AND date = '$date'");
+						}
+						$this->conn->query("UPDATE `interns` SET status = 1 WHERE id = '$intern_id'");
 						$response['success'] = true;
 					}
 					else{
@@ -150,17 +160,19 @@ class Master extends DBConnection{
 		$timeAbbreviation = date('A');
 		if($timeAbbreviation === 'PM'){
 			$checkQuery = $this->conn->query("SELECT * FROM `daily_time_records` WHERE intern_id = '$intern_id' AND date = '$date'");
-			if($checkQuery->num_rows < 0){
+			if($checkQuery->num_rows <= 0){
 				$response['success'] = false;
 				$response['message'] = "Opss! You have not time-in on this day.";
 			}
 			elseif($checkQuery->num_rows === 1){
 				$checkResult = $checkQuery->fetch_assoc();
 				if(!$checkResult['departure_pm']){
-					$stmt = $this->conn->prepare("UPDATE `daily_time_records` SET departure_pm =? WHERE intern_id =? AND date =?");
-					$stmt->bind_param("sss", $time, $intern_id, $date);
+					$stmt = $this->conn->prepare("UPDATE `daily_time_records` SET departure_pm =?, worked_hours_pm =? WHERE intern_id =? AND date =?");
+					$stmt->bind_param("ssss", $time, $workedHours, $intern_id, $date);
 					$result = $stmt->execute();
 					if($result){
+						$this->conn->query("UPDATE daily_time_records SET worked_hours_pm = TIMEDIFF(departure_pm, arrival_pm) WHERE intern_id = '$intern_id' AND date = '$date'");
+						$this->conn->query("UPDATE `interns` SET status = 0 WHERE id = '$intern_id'");
 						$response['success'] = true;
 					}
 					else{

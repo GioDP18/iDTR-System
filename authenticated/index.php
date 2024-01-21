@@ -38,7 +38,13 @@
 											<i class="fas fa-hourglass-end" style="font-size:6rem; color:#0ea511; opacity:70%"></i>
 										</div>
 										<div>
-											<h1><?= $completed_hours ?> H</h1>
+											<?php
+												$completed_time = explode(':', $completed_hours);
+												$hours_completed = ltrim($completed_time[0], '0');
+												$minutes_completed = ltrim($completed_time[1], '0');
+												$seconds_completed = ltrim($completed_time[2], '0');
+											?>
+											<h1><?= $hours_completed != '' ? $hours_completed:'0' ?>H <?= $minutes_completed != '' ? $minutes_completed:'0' ?>M <?= $seconds_completed != '' ? $seconds_completed:'0' ?>S</h1>
 										</div>
 									</div>
 								</div>
@@ -53,7 +59,13 @@
 											<i class="fas fa-hourglass-end text-danger" style="font-size:6rem; transform:rotate(180deg); opacity:70%"></i>
 										</div>
 										<div>
-											<h1><?= $remaining_hours ?> H</h1>
+											<?php
+												$remaining_time = explode(':', $remaining_hours);
+												$hours_remaining = ltrim($remaining_time[0], '0');
+												$minutes_remaining = ltrim($remaining_time[1], '0');
+												$seconds_remaining = ltrim($remaining_time[2], '0');
+											?>
+											<h1><?= $hours_remaining != '' ? $hours_remaining:'0' ?>H <?= $minutes_remaining != '' ? $minutes_remaining:'0' ?>M <?= $seconds_remaining != '' ? $seconds_remaining:'0' ?>S</h1>
 										</div>
 									</div>
 								</div>
