@@ -25,6 +25,7 @@ $gender = $userDetails['gender'];
 $birthdate = $userDetails['birthdate'];
 $email = $userDetails['email'];
 $status = $userDetails['status'];
+$overtime_status = $userDetails['overtime_status'];
 $completed_hours = $userDetails['completed_hours'];
 $remaining_hours = $userDetails['remaining_hours'];
 

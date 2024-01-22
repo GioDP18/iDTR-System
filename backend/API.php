@@ -200,6 +200,24 @@ class Master extends DBConnection{
 		echo json_encode($response);
 		exit;
 	}
+
+	function create_new_report(){
+		extract($_POST);
+        $stmt = $this->conn->prepare("INSERT INTO `reports` (intern_id, report_title, report_content) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $intern_id, $report_title, $report_content);
+        $result = $stmt->execute();
+        if($result){
+            $response['success'] = true;
+        }
+        else{
+            $response['success'] = false;
+			$response['message'] = "There was an error creating your report. Please try again later.";
+        }
+        $stmt->close();
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+	}
 	
 }
 
@@ -217,6 +235,9 @@ switch($action){
 		break;
 	case 'time_out_pm':
 		echo $Master->time_out_pm();
+		break;
+	case 'create_new_report':
+		echo $Master->create_new_report();
 		break;
 
     default:
