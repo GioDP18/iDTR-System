@@ -113,8 +113,21 @@ class Master extends DBConnection{
 		if($timeAbbreviation === 'PM'){
 			$checkQuery = $this->conn->query("SELECT * FROM `daily_time_records` WHERE intern_id = '$intern_id' AND date = '$date'");
 			if($checkQuery->num_rows <= 0){
-				$response['success'] = false;
-				$response['message'] = "Opss! You have not time-in on this morning.";
+				$stmt = $this->conn->prepare("INSERT INTO `daily_time_records` (intern_id, arrival_pm, date) VALUES(?, ?, ?)");
+				$stmt->bind_param("sss", $intern_id, $time, $date);
+				$result = $stmt->execute();
+				if($result){
+					if($time > '13:00:00'){
+						$this->conn->query("UPDATE daily_time_records SET late_pm = TIMEDIFF(arrival_pm, STR_TO_DATE('13:00:00', '%H:%i:%s')) WHERE intern_id = '$intern_id' AND date = '$date'");
+					}
+					$this->conn->query("UPDATE `interns` SET status = 1 WHERE id = '$intern_id'");
+					$response['success'] = true;
+				}
+				else{
+					$response['success'] = false;
+					$response['message'] = "There was an error logging your time-in. Please try again later.";
+				}
+				$stmt->close();
 			}
 			elseif($checkQuery->num_rows === 1){
 				$checkResult = $checkQuery->fetch_assoc();
@@ -167,8 +180,8 @@ class Master extends DBConnection{
 			elseif($checkQuery->num_rows === 1){
 				$checkResult = $checkQuery->fetch_assoc();
 				if(!$checkResult['departure_pm']){
-					$stmt = $this->conn->prepare("UPDATE `daily_time_records` SET departure_pm =?, worked_hours_pm =? WHERE intern_id =? AND date =?");
-					$stmt->bind_param("ssss", $time, $workedHours, $intern_id, $date);
+					$stmt = $this->conn->prepare("UPDATE `daily_time_records` SET departure_pm =? WHERE intern_id =? AND date =?");
+					$stmt->bind_param("sss", $time, $intern_id, $date);
 					$result = $stmt->execute();
 					if($result){
 						$this->conn->query("UPDATE daily_time_records SET worked_hours_pm = TIMEDIFF(departure_pm, arrival_pm) WHERE intern_id = '$intern_id' AND date = '$date'");
@@ -218,7 +231,71 @@ class Master extends DBConnection{
         echo json_encode($response);
         exit;
 	}
-	
+
+	function start_overtime(){
+		extract($_POST);
+		$checkQuery = $this->conn->query("SELECT * FROM `daily_time_records` WHERE intern_id = '$intern_id' AND date = '$date'");
+		if($checkQuery->num_rows > 0){
+			$checkResult = $checkQuery->fetch_assoc();
+			if(!$checkResult['overtime_start']){
+				$stmt = $this->conn->prepare("UPDATE `daily_time_records` SET overtime_start =? WHERE intern_id =? AND date =?");
+				$stmt->bind_param("sss", $time, $intern_id, $date);
+				$result = $stmt->execute();
+
+				if($result){
+					$this->conn->query("UPDATE `interns` SET overtime_status = 1 WHERE id = '$intern_id'");
+					$response['success'] = true;
+				}
+				else{
+					$response['success'] = false;
+					$response['message'] = "There was an error starting your overtime. Please try again later.";
+				}
+				$stmt->close();
+			}
+			else{
+				$response['success'] = false;
+                $response['message'] = "You have already overtime this day.";
+			}
+		}
+		else{
+			$stmt = $this->conn->prepare("INSERT INTO `daily_time_records` (intern_id, overtime_start, date) VALUES (?, ?, ?)");
+			$stmt->bind_param("sss", $intern_id, $time, $date);
+			$result = $stmt->execute();
+
+			if($result){
+				$this->conn->query("UPDATE `interns` SET overtime_status = 1 WHERE id = '$intern_id'");
+				$response['success'] = true;
+			}
+			else{
+				$response['success'] = false;
+				$response['message'] = "There was an error starting your overtime. Please try again later.";
+			}
+			$stmt->close();
+		}
+		header('Content-Type: application/json');
+		echo json_encode($response);
+		exit;
+	}
+
+	function stop_overtime(){
+		extract($_POST);
+		$stmt = $this->conn->prepare("UPDATE `daily_time_records` SET overtime_end =? WHERE intern_id =? AND date =?");
+		$stmt->bind_param("sss", $time, $intern_id, $date);
+		$result = $stmt->execute();
+		if($result){
+			$this->conn->query("UPDATE daily_time_records SET overtime_duration = TIMEDIFF(overtime_end, overtime_start) WHERE intern_id = '$intern_id' AND date = '$date'");
+			$this->conn->query("UPDATE `interns` SET overtime_status = 0 WHERE id = '$intern_id'");
+			$response['success'] = true;
+		}
+		else{
+			$response['success'] = false;
+			$response['message'] = "There was an error logging your overtime. Please try again later.";
+		}
+		$stmt->close();
+		header('Content-Type: application/json');
+		echo json_encode($response);
+		exit;
+	}
 }
 
 $Master = new Master();
@@ -238,6 +315,12 @@ switch($action){
 		break;
 	case 'create_new_report':
 		echo $Master->create_new_report();
+		break;
+	case 'start_overtime':
+		echo $Master->start_overtime();
+		break;
+	case 'stop_overtime':
+		echo $Master->stop_overtime();
 		break;
 
     default:

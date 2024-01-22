@@ -88,7 +88,7 @@
 										?>
 										<tr>
 											<td><?= date_create($row['date'])->format('M d, Y') ?></td>
-											<td><?= date_create($row['arrival_am'])->format('h:i A'); ?></td>
+											<td><?= $row['arrival_am'] ? date_create($row['arrival_am'])->format('h:i A'):''; ?></td>
 											<td><?= $row['departure_am'] ? date_create($row['departure_am'])->format('h:i A'):''; ?></td>
 											<td><?= $row['late_am'] ?></td>
 											<td><?= $row['worked_hours_am']; ?></td>
