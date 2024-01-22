@@ -1,4 +1,12 @@
-<?php session_start(); require_once('../backend/const.php'); ?>
+<?php 
+session_start();
+// Check if the user is not authenticated
+if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
+    // Redirect to the login page
+    header('Location: ../index.php?error-login=You are not authenticated. Please login first.');
+    exit();
+}
+require_once('../backend/const.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +19,7 @@
 
 	<!-- Fontawesome -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-	
+
 	<!-- Fonts and icons -->
 	<script src="../assets/js/plugin/webfont/webfont.min.js"></script>
 	<script>

@@ -32,7 +32,9 @@
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#">Account Setting</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Logout</a>
+                            <form action="../backend/authentication.php" method="POST">
+                                <button type="submit" name="logout" class="dropdown-item">Logout</button>
+                            </form>
                         </li>
                     </div>
                 </ul>
