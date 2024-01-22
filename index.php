@@ -146,13 +146,25 @@
         </div>
         <div class="login-container">
             <div class="login-form">
-                <form class="form" action="backend/authenticate.php" method="POST" style="position:relative;">
+                <form class="form" action="backend/authentication.php" method="POST" style="position:relative;">
                     <?php if(isset($_GET['error-login'])): ?>
-                        <div class="" style="position:absolute; top:-2.5rem; ">
+                        <div class="" style="position:absolute; top:-3rem; ">
                             <div class="" style="background-color:#F1AEB5;">
                                 <p style="text-align:center; font-size:small; width:18rem; padding:.5rem 0;"><?= $_GET['error-login'] ?></p>
                             </div>
                         </div>
+                    <?php endif; ?>
+                    <?php if(isset($_GET['logout-message'])): ?>
+                        <div class="logout-success" style="position:absolute; top:-3rem; ">
+                            <div class="" style="background-color:#F1AEB5;">
+                                <p style="text-align:center; font-size:small; width:18rem; padding:.5rem 0;"><?= $_GET['logout-message'] ?></p>
+                            </div>
+                        </div>
+                        <script>
+                            setTimeout(function(){
+                                document.querySelector('.logout-success').style.display = 'none';
+                            }, 3000);
+                        </script>
                     <?php endif; ?>
                     <p class="form-title">Sign in to your account</p>
                     <div class="input-container">

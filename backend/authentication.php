@@ -20,8 +20,7 @@ if (isset($_POST['login'])) {
             $user = $result->fetch_assoc();
             if ($password === $user['password']) {
                 session_start();
-
-                // Session variables
+                $_SESSION['authenticated'] = true;
                 $_SESSION['id'] = $user['id'];
 
                 // Reidrect to home page
@@ -37,6 +36,13 @@ if (isset($_POST['login'])) {
     } else {
         echo "Error in database query";
     }
+}
+
+
+if(isset($_POST['logout'])){
+    session_destroy();
+    $_SESSION['authenticated'] = false;
+    echo "<script>location.href='../index.php?logout-message=Logged out successfully!'</script>";
 }
 
 ?>

@@ -123,9 +123,9 @@
 			});
 	})
 
-	function time_in_am(intern_id, time, date, formattedCurrentTime){
+	function startOvertime(intern_id, time, date, formattedCurrentTime){
 		$.ajax({
-			url: '../backend/API.php?f=time_in_am',
+			url: '../backend/API.php?f=start_overtime',
 			method: 'POST',
 			data: {
 				intern_id: intern_id,
@@ -164,9 +164,9 @@
 		});
 	}
 
-	function time_out_am(intern_id, time, date, formattedCurrentTime){
+	function stopOvertime(intern_id, time, date, formattedCurrentTime){
 		$.ajax({
-			url: '../backend/API.php?f=time_out_am',
+			url: '../backend/API.php?f=stop_overtime',
 			method: 'POST',
 			data: {
 				intern_id: intern_id,
@@ -218,7 +218,7 @@
 		})
 		.then((willDelete) => {
 			if (willDelete) {
-				time_in_am(intern_id, time, date, formattedCurrentTime);
+				startOvertime(intern_id, time, date, formattedCurrentTime);
 			}
 		});
 	}
@@ -235,7 +235,7 @@
 		})
 		.then((willDelete) => {
 			if (willDelete) {
-				time_out_am(intern_id, time, date, formattedCurrentTime);
+				stopOvertime(intern_id, time, date, formattedCurrentTime);
 			}
 		});
 	}
