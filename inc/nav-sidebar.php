@@ -31,7 +31,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     </span>
                     <h4 class="text-section">Monitoring</h4>
                 </li>
-                <li class="nav-item <?= $currentPage=='timeLog_am.php' || $currentPage=='timeLog_pm.php' ? 'active':'' ?>">
+                <li class="nav-item <?= $currentPage=='timeLog_am.php' || $currentPage=='timeLog_pm.php' || $currentPage=='overtime.php' ? 'active':'' ?>">
                     <a data-toggle="collapse" href="#timeLog" class="collapsed" aria-expanded="false">
                         <i class="fas fa-clock"></i>
                         <p>Time Log</p>
@@ -49,9 +49,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                                     <span class="sub-item">PM</span>
                                 </a>
                             </li>
-                            <li class=" <?= $currentPage=='summary.php' ? 'active':'' ?>">
-                                <a href="summary.php">
-                                    <span class="sub-item">Summary</span>
+                            <li class=" <?= $currentPage=='overtime.php' ? 'active':'' ?>">
+                                <a href="overtime.php">
+                                    <span class="sub-item">Overtime</span>
                                 </a>
                             </li>
                         </ul>

@@ -154,6 +154,17 @@
 	transform: scale(1);
 }
 
+#closeCreateModal{
+	border: 1px solid #6910a0;
+	color: #6910a0;
+}
+
+#closeCreateModal:hover{
+	background-color: #6910a0;
+	color: white;
+	border: 1px solid white;
+}
+
 </style>
 <!-- Content -->
 	<div class="wrapper">
@@ -180,11 +191,40 @@
 								<h2 class="text-white pb-2 fw-bold">Reports</h2>
 							</div>
 							<div>
-								<button class="create-report-btn"><i class="fas fa-pen"></i> Create New Report </button>
+								<button class="create-report-btn" data-bs-toggle="modal" data-bs-target="#createNewReport"><i class="fas fa-pen"></i> Create New Report </button>
 							</div>
 						</div>
 					</div>
 				</div>
+
+				<!-- Modal -->
+				<div class="modal fade" id="createNewReport" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<form action="">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h1 class="modal-title fs-5" id="staticBackdropLabel"><i class="fa-solid fa-pen-to-square"></i> Create New report</h1>
+								</div>
+								<div class="modal-body">
+									<div class="mb-3">
+										<label for="reportTitle" class="form-label">Title</label>
+										<input type="email" class="form-control" id="reportTitle" placeholder="What's your title?">
+									</div>
+									<div class="mb-3">
+										<label for="reportContent" class="form-label">Content</label>
+										<textarea class="form-control" id="reportContent" rows="3"></textarea>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="submit" class="btn" style="background-color:#6910A0; color:white;" onclick="saveNewReport(event, <?= $intern_id ?>)">Save</button>
+									<button type="button" class="btn" id="closeCreateModal" data-bs-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</form>
+						
+					</div>
+				</div>
+
 				<div class="page-inner mt--5">
 					<div class="row mt--2">
 						<div class="col-md-12">
@@ -389,4 +429,53 @@
 	</div>
 <!-- End of Content -->
 
+<script>
+	// window.onload = function(){
+
+	// }
+
+
+	function saveNewReport(event, intern_id){
+		event.preventDefault();
+		$('#createNewReport').modal('hide');
+		$.ajax({
+			url: '../backend/API.php?f=create_new_report',
+			method: 'POST',
+			data: {
+				intern_id: intern_id,
+			    report_title: $('#reportTitle').val(),
+				report_content: $('#reportContent').val()
+			},
+			dataType: 'json',
+			success: function(response) {
+				if(response.success == true){
+					swal({
+						title: "Successfully Created your Report!",
+						icon: "success",
+						button: "Okay",
+					});
+
+					setTimeout(function() {
+						location.reload();
+					}, 3000);
+				}
+				else{
+					console.log(response.message)
+					swal({
+						title: response.message,
+						icon: "error",
+						button: "Okay",
+					});
+
+					setTimeout(function() {
+						
+					}, 3000);
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error('Error:', error);
+			}
+		});
+	}
+</script>
 <?php require_once('../inc/footer.php'); ?>
