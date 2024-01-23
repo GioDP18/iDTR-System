@@ -82,7 +82,7 @@
 									</thead>
 									<tbody>
 										<?php
-											$fetchMyTimeLogQuesry = "SELECT * FROM `daily_time_records` WHERE intern_id = '$intern_id' AND overtime_start != NULL ORDER BY date DESC";
+											$fetchMyTimeLogQuesry = "SELECT * FROM `daily_time_records` WHERE intern_id = '$intern_id' AND overtime_start IS NOT NULL ORDER BY date DESC";
 											$result = $db->conn->query($fetchMyTimeLogQuesry);
 											if ($result->num_rows > 0):
 												// output data of each row
@@ -90,7 +90,7 @@
 										?>
 										<tr>
 											<td><?= date_create($row['date'])->format('M d, Y') ?></td>
-											<td><?= date_create($row['overtime_start'])->format('h:i A'); ?></td>
+											<td><?= $row['overtime_start'] ? date_create($row['overtime_start'])->format('h:i A'):''; ?></td>
 											<td><?= $row['overtime_end'] ? date_create($row['overtime_end'])->format('h:i A'):''; ?></td>
 											<td><?= $row['overtime_duration']; ?></td>
 										</tr>
@@ -123,6 +123,57 @@
 			});
 	})
 
+	let intervalId;
+
+	function showNotification(title, options) {
+		// Check if the browser supports notifications
+		if (!('Notification' in window)) {
+			console.error('This browser does not support system notifications.');
+			return;
+		}
+
+		// Check notification permission
+		Notification.requestPermission().then(function (permission) {
+			console.log('Notification Permission:', permission);
+
+			if (permission === 'granted') {
+				// Create a notification
+				const notification = new Notification(title, options);
+			} else {
+				console.error('Permission for notifications denied by user.');
+			}
+		});
+	}
+
+	function startOvertimer() {
+		console.log('Overtime Started');
+		const startTime = Date.now();
+		const options = {
+			body: 'The overtime timer has started.',
+		};
+
+		showNotification('Overtime Started', options);
+
+		// Schedule notifications every hour
+		intervalId = setInterval(function () {
+			const elapsedTime = (Date.now() - startTime) / 1000;
+			const hours = Math.floor(elapsedTime / 3600);
+			const minutes = Math.floor((elapsedTime % 3600) / 60);
+
+			const timerOptions = {
+				body: `Elapsed Time: ${hours} hours and ${minutes} minutes.`,
+			};
+
+			showNotification('Overtime Reminder', timerOptions);
+		}, 60000);
+	}
+
+	function stopOvertimer() {
+		clearInterval(intervalId);
+		console.log('Interval cleared');
+		showNotification('Overtime Stopped');
+	}
+
 	function startOvertime(intern_id, time, date, formattedCurrentTime){
 		$.ajax({
 			url: '../backend/API.php?f=start_overtime',
@@ -135,8 +186,9 @@
 			dataType: 'json',
 			success: function(response) {
 				if(response.success == true){
+					startOvertimer()
 					swal({
-						title: "Time-in Recoded",
+						title: "Overtime Started!",
 						icon: "success",
 						button: "Okay",
 					});
@@ -176,8 +228,9 @@
 			dataType: 'json',
 			success: function(response) {
 				if(response.success == true){
+					stopOvertimer()
 					swal({
-						title: "Time-out Recoded",
+						title: "Overtime Recoded",
 						icon: "success",
 						button: "Okay",
 					});
@@ -185,6 +238,7 @@
 					setTimeout(function() {
 						location.reload();
 					}, 3000);
+					
 				}
 				else{
 					console.log(response.message)

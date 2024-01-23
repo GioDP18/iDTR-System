@@ -39,14 +39,19 @@ $getTotalWorkedHours_pm = $db->conn->query("SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(w
 $total_hours_worked_pm = $getTotalWorkedHours_pm->fetch_assoc()['total_worked_hours_pm'];
 
 
+// Add the total hours overtime
+$getTotalOvertime = $db->conn->query("SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(overtime_duration))) AS total_overtime FROM daily_time_records WHERE intern_id = '$intern_id';");
+$total_overtime = $getTotalOvertime->fetch_assoc()['total_overtime'];
+
+
 // Update the total hours worked on interns table
-$updateTimeQry = "UPDATE interns SET total_hours_worked_am = ?, total_hours_worked_pm = ? WHERE user_id = ?";
+$updateTimeQry = "UPDATE interns SET total_hours_worked_am = ?, total_hours_worked_pm = ?, total_overtime = ? WHERE user_id = ?";
 $updateTime = $db->conn->prepare($updateTimeQry);
-$updateTime->bind_param('sss', $total_hours_worked_am, $total_hours_worked_pm, $_SESSION['id']);
+$updateTime->bind_param('ssss', $total_hours_worked_am, $total_hours_worked_pm, $total_overtime, $_SESSION['id']);
 $updateTime->execute();
 
 // Update the completed hours on interns table
-$updateCompletedHoursQry = "UPDATE interns SET completed_hours = ADDTIME(total_hours_worked_am, total_hours_worked_pm) WHERE user_id = ?";
+$updateCompletedHoursQry = "UPDATE interns SET completed_hours = ADDTIME(ADDTIME(total_hours_worked_am, total_hours_worked_pm), total_overtime) WHERE user_id = ?";
 $updateCompletedHours = $db->conn->prepare($updateCompletedHoursQry);
 $updateCompletedHours->bind_param('s', $_SESSION['id']);
 $updateCompletedHours->execute();
